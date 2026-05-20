@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+usage:
+  ./aoj t [PROBLEM]       test
+  ./aoj r [PROBLEM]       run
+  ./aoj d [PROBLEM]       debug
+  ./aoj b [PROBLEM]       build
+  ./aoj n PROBLEM         new
+  ./aoj l                 list problems
+  ./aoj c                 clean
+
+If PROBLEM is omitted, the newest problems/*.cpp file is used.
+USAGE
+}
+
+repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$repo_dir"
+
+problem_from_path() {
+  local path="$1"
+  path="${path#problems/}"
+  path="${path%.cpp}"
+  printf '%s\n' "$path"
+}
+
+latest_problem() {
+  local latest
+  latest="$(find problems -maxdepth 1 -type f -name '*.cpp' -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -n 1 | cut -d' ' -f2-)"
+  if [[ -z "$latest" ]]; then
+    echo "no problem files found in problems/" >&2
+    exit 1
+  fi
+  problem_from_path "$latest"
+}
+
+cmd="${1:-}"
+problem="${2:-}"
+
+case "$cmd" in
+  b | build)
+    make build PROBLEM="${problem:-$(latest_problem)}"
+    ;;
+  r | run)
+    make run PROBLEM="${problem:-$(latest_problem)}"
+    ;;
+  d | debug)
+    make debug PROBLEM="${problem:-$(latest_problem)}"
+    ;;
+  t | test)
+    make test PROBLEM="${problem:-$(latest_problem)}"
+    ;;
+  n | new)
+    if [[ -z "$problem" ]]; then
+      echo "problem name is required" >&2
+      usage
+      exit 1
+    fi
+    make new PROBLEM="$problem"
+    ;;
+  l | list)
+    find problems -maxdepth 1 -type f -name '*.cpp' -printf '%f\n' 2>/dev/null | sed 's/\.cpp$//' | sort
+    ;;
+  c | clean)
+    make clean
+    ;;
+  -h | --help | help | "")
+    usage
+    ;;
+  *)
+    echo "unknown command: $cmd" >&2
+    usage
+    exit 1
+    ;;
+esac
+
