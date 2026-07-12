@@ -8,7 +8,12 @@ usage:
   ./aoj r [PROBLEM]       run
   ./aoj d [PROBLEM]       debug
   ./aoj b [PROBLEM]       build
+  ./aoj s [PROBLEM]       generate submit/PROBLEM.cpp
   ./aoj n PROBLEM         new
+  ./aoj lib URL [DIR] [BRANCH]
+                          clone or update C++ library into lib/
+  ./aoj lib URL --branch BRANCH
+                          clone or update a specific branch
   ./aoj l                 list problems
   ./aoj c                 clean
 
@@ -38,6 +43,8 @@ latest_problem() {
 
 cmd="${1:-}"
 problem="${2:-}"
+arg3="${3:-}"
+arg4="${4:-}"
 
 case "$cmd" in
   b | build)
@@ -52,6 +59,9 @@ case "$cmd" in
   t | test)
     make test PROBLEM="${problem:-$(latest_problem)}"
     ;;
+  s | submit)
+    make submit PROBLEM="${problem:-$(latest_problem)}"
+    ;;
   n | new)
     if [[ -z "$problem" ]]; then
       echo "problem name is required" >&2
@@ -59,6 +69,14 @@ case "$cmd" in
       exit 1
     fi
     make new PROBLEM="$problem"
+    ;;
+  lib | library)
+    if [[ -z "$problem" ]]; then
+      echo "library URL is required" >&2
+      usage
+      exit 1
+    fi
+    ./scripts/install_library.sh "$problem" "$arg3" "$arg4"
     ;;
   l | list)
     find problems -maxdepth 1 -type f -name '*.cpp' -printf '%f\n' 2>/dev/null | sed 's/\.cpp$//' | sort
@@ -75,4 +93,3 @@ case "$cmd" in
     exit 1
     ;;
 esac
-

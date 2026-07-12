@@ -1,6 +1,12 @@
 build/
 *.out
+!samples/*.out
+!samples/**/*.out
 *.exe
 *.dSYM/
+__pycache__/
 .vscode/
-
+lib/*
+!lib/.gitkeep
+submit/*
+!submit/.gitkeep

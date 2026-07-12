@@ -56,6 +56,60 @@ samples/<PROBLEM>/2.out
 ./aoj d ITP1_1_A
 ```
 
+## 自作 C++ ライブラリ
+
+GitHub 上のヘッダライブラリは `lib/` に取得して使います。
+
+```sh
+./aoj lib git@github.com:USER/REPOSITORY.git
+```
+
+取得後は、`include/`、`lib/`、`lib/REPOSITORY/`、
+`lib/REPOSITORY/include/` が自動で include パスに入ります。
+たとえば `lib/cp-library/data_structure/segtree.hpp` がある場合は、
+次のように書けます。
+
+```cpp
+#include "cp-library/data_structure/segtree.hpp"
+```
+
+取得先ディレクトリ名を指定したい場合は、第 2 引数を使います。
+
+```sh
+./aoj lib git@github.com:USER/REPOSITORY.git lib/cp-library
+```
+
+ブランチを指定したい場合は、第 3 引数を使います。
+
+```sh
+./aoj lib git@github.com:USER/REPOSITORY.git lib/cp-library main
+```
+
+取得先ディレクトリを省略してブランチだけ指定する場合は、`--branch` を使います。
+
+```sh
+./aoj lib git@github.com:USER/REPOSITORY.git --branch main
+```
+
+## 提出コード生成
+
+AOJ に提出する前に、自作ライブラリの include を展開した単一ファイルを生成できます。
+`#include "cp/io.hpp"` と `#include <cp/io.hpp>` のどちらも、ローカルライブラリに
+見つかるものは展開します。標準ライブラリの include はそのまま残します。
+
+```sh
+./aoj s ITP1_4_A
+```
+
+生成先は `submit/ITP1_4_A.cpp` です。問題名を省略した場合は、最後に更新された
+`problems/*.cpp` を使います。
+
+`make` から直接実行する場合は次の通りです。
+
+```sh
+make s PROBLEM=ITP1_4_A
+```
+
 問題名を省略すると、最後に更新された `problems/*.cpp` を使います。
 
 ```sh

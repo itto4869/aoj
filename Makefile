@@ -12,18 +12,21 @@ NAME := $(basename $(notdir $(SRC)))
 BIN := build/$(NAME)
 INPUT ?= samples/$(NAME).in
 EXPECTED ?= samples/$(NAME).out
+SUBMIT ?= submit/$(NAME).cpp
 
 CXXFLAGS ?= -std=$(STD) -O2 -pipe -Wall -Wextra -Wshadow
 DEBUGFLAGS ?= -std=$(STD) -O0 -g3 -D_GLIBCXX_DEBUG -fsanitize=address,undefined -Wall -Wextra -Wshadow
+LIB_INCLUDE_DIRS := $(wildcard lib/*/ lib/*/include/)
+CPPFLAGS ?= -Iinclude -Ilib $(addprefix -I,$(LIB_INCLUDE_DIRS))
 
-.PHONY: build run debug test new clean b r d t n c
+.PHONY: build run debug test submit new clean b r d t s n c
 
 build: $(BIN)
 b: build
 
 $(BIN): $(SRC)
 	@mkdir -p build
-	$(CXX) $(CXXFLAGS) $< -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@
 
 run: build
 	@if [ -f "$(INPUT)" ]; then \
@@ -35,7 +38,7 @@ r: run
 
 debug: $(SRC)
 	@mkdir -p build
-	$(CXX) $(DEBUGFLAGS) $< -o $(BIN)-debug
+	$(CXX) $(CPPFLAGS) $(DEBUGFLAGS) $< -o $(BIN)-debug
 	@if [ -f "$(INPUT)" ]; then \
 		ASAN_OPTIONS=detect_leaks=0 ./$(BIN)-debug < "$(INPUT)"; \
 	else \
@@ -46,6 +49,10 @@ d: debug
 test: build
 	@./scripts/run_tests.sh ./$(BIN) "$(NAME)" "$(INPUT)" "$(EXPECTED)"
 t: test
+
+submit:
+	@./scripts/expand_submit.py "$(SRC)" "$(SUBMIT)"
+s: submit
 
 new:
 	@if [ -z "$(PROBLEM)" ]; then \
