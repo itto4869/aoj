@@ -91,6 +91,24 @@ GitHub 上のヘッダライブラリは `lib/` に取得して使います。
 ./aoj lib git@github.com:USER/REPOSITORY.git --branch main
 ```
 
+インストール済みの Git ライブラリをまとめて更新するには、次を実行します。
+
+```sh
+./aoj update-lib
+```
+
+特定のライブラリだけを更新する場合は、`lib/` 配下の名前またはパスを指定します。
+
+```sh
+./aoj update-lib cp-library
+# または
+./aoj update-lib lib/cp-library
+```
+
+更新は `git pull --ff-only` で行われます。ローカルの変更があるライブラリや、
+追跡先ブランチが設定されていないライブラリは安全のため更新しません。
+更新されたヘッダは次回のビルド時に自動検出されます。
+
 ## 提出コード生成
 
 AOJ に提出する前に、自作ライブラリの include を展開した単一ファイルを生成できます。

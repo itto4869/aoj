@@ -10,6 +10,7 @@ endif
 
 NAME := $(basename $(notdir $(SRC)))
 BIN := build/$(NAME)
+DEP := build/$(NAME).d
 INPUT ?= samples/$(NAME).in
 EXPECTED ?= samples/$(NAME).out
 SUBMIT ?= submit/$(NAME).cpp
@@ -24,9 +25,11 @@ CPPFLAGS ?= -Iinclude -Ilib $(addprefix -I,$(LIB_INCLUDE_DIRS))
 build: $(BIN)
 b: build
 
-$(BIN): $(SRC)
+$(BIN): $(SRC) Makefile
 	@mkdir -p build
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -MP -MF $(DEP) $< -o $@
+
+-include $(DEP)
 
 run: build
 	@if [ -f "$(INPUT)" ]; then \
