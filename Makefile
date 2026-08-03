@@ -55,6 +55,8 @@ t: test
 
 submit:
 	@./scripts/expand_submit.py "$(SRC)" "$(SUBMIT)"
+	@./scripts/copy_to_clipboard.sh "$(SUBMIT)" || \
+		echo "submission file was generated, but it was not copied to the clipboard" >&2
 s: submit
 
 new:
